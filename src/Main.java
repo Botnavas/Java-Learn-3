@@ -17,18 +17,18 @@ public class Main {
                 "Create subTask for second epic", 5, epic2);
         taskManager.addTask(epic1);
         taskManager.addTask(epic2);
-        taskManager.addTask(epic1FirstSubTask);
+        epic1FirstSubTask = (SubTask) taskManager.addTask(epic1FirstSubTask);
         taskManager.addTask(epic1SecondSubTask);
         taskManager.addTask(epic2FirstSubTask);
 
-        for (Task task : taskManager.getTaskList()) {
+        for (Task task : taskManager.getTasks()) {
             System.out.println(task);
         }
 
-        taskManager.changeStatus(2, TaskStatus.DONE);
+        taskManager.changeStatus(epic1FirstSubTask.getId(), TaskStatus.DONE);
         System.out.println("New status for first epic and first SubTask");
 
-        for (Task task : taskManager.getTaskList()) {
+        for (Task task : taskManager.getTasks()) {
             System.out.println(task);
         }
 

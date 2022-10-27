@@ -1,11 +1,14 @@
 package model;
 
+import java.util.Objects;
+
 public class Task {
-    protected int id;
+    protected final int id;
     protected TaskStatus status;
     protected String name;
     protected String description;
 
+    //TODO: refactor
     public Task(String name, String description, int id) {
         this.id = id;
         this.name = name;
@@ -23,10 +26,6 @@ public class Task {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -48,16 +47,14 @@ public class Task {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder("ID: ");
-        result.append(id);
-        result.append("\nName: ");
-        result.append(name);
-        result.append("\nStatus: ");
-        result.append(status);
-        result.append("\nDescription: ");
-        result.append(description);
-        result.append("\n");
-        return result.toString();
+        return "ID: " + id +
+                "\nName: " +
+                name +
+                "\nStatus: " +
+                status +
+                "\nDescription: " +
+                description +
+                "\n";
     }
 
     @Override
@@ -67,15 +64,15 @@ public class Task {
 
         Task task = (Task) o;
 
-        if (id != task.id) return false;
-        if (status != task.status) return false;
-        if (!name.equals(task.name)) return false;
-        return description.equals(task.description);
+        return status == task.status
+                && name.equals(task.name)
+                && description.equals(task.description);
     }
 
+    //TODO: hashcode(id)
     @Override
     public int hashCode() {
-        return id;
+        return Objects.hashCode(id);
     }
 }
 

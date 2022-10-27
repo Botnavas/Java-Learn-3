@@ -1,6 +1,6 @@
 package model;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class EpicTask extends Task {
@@ -13,70 +13,64 @@ public class EpicTask extends Task {
 
     public void addSubTask(SubTask subTask) {
         subTasks.put(subTask.getId(), subTask);
-        refreshStatus();
     }
 
-    //1 - new; 2 - in progress; 3 - done
-    private void refreshStatus() {
-        boolean isNew = false;
-        boolean isInProgress = false;
-        boolean isDone = false;
-        for (SubTask subTask : subTasks.values()) {
-            switch (subTask.status) {
-                case NEW :
-                    isNew = true;
-                    break;
-                case IN_PROGRESS:
-                    isInProgress = true;
-                    break;
-                case DONE:
-                    isDone = true;
-                    break;
-                default:
-            }
-        }
-        if ((isNew && isInProgress) || (isNew && isDone) || (isInProgress && isDone)) {
-            status = TaskStatus.IN_PROGRESS;
-        } else if (isNew) {
-            status = TaskStatus.NEW;
-        } else {
-            status = TaskStatus.DONE;
-        }
+    public Collection<SubTask> getSubTasks() {
+        return subTasks.values();
     }
 
-    public void setStatusForSubtask(int subTaskId, TaskStatus status) {
-        subTasks.get(subTaskId).setStatus(status);
+    public Collection<Integer> getSubtasksIDs() {
+        return  subTasks.keySet();
     }
 
-    public HashMap<Integer, SubTask> getSubTasksHashMap() {
-        return subTasks;
+    public SubTask getSubTaskByID(int id) {
+        return subTasks.get(id);
     }
 
-    public ArrayList<SubTask> getSubTasksList() {
-        ArrayList<SubTask> subTasks = new ArrayList<>();
-        subTasks.addAll(this.subTasks.values());
-        return subTasks;
+    public void setStatusForSubTaskById(int id, TaskStatus status) {
+        subTasks.get(id).setStatus(status);
     }
 
-    @Override
-    public void setStatus(TaskStatus status) {
-        if (status == TaskStatus.DONE) {
-            for (SubTask subTask : subTasks.values()) {
-                subTask.setStatus(status);
-            }
-            this.status = status;
-        }
+    public void removeAllSubTasks() {
+        subTasks.clear();
     }
 
+    public void removeSubTaskByID(int id) {
+        subTasks.remove(id);
+    }
+
+    //TODO: refactor
     @Override
     public TaskStatus getStatus() {
-        refreshStatus();
+        boolean isNew = true;
+        boolean isDone = true;
+        for (SubTask subTask : subTasks.values()) {
+            switch (subTask.status) {
+                case NEW:
+                    isDone = false;
+                    break;
+                case IN_PROGRESS:
+                    isNew = false;
+                    isDone = false;
+                    break;
+                case DONE:
+                    isNew = false;
+                    break;
+            }
+        }
+        if (isNew) {
+            status = TaskStatus.NEW;
+        } else if (isDone) {
+            status = TaskStatus.DONE;
+        } else {
+            status = TaskStatus.IN_PROGRESS;
+        }
         return status;
     }
 
     @Override
     public String toString() {
-        refreshStatus();
+        status = getStatus();
         StringBuilder result = new StringBuilder("Epic task:\n" + super.toString());
         for (SubTask subTask : subTasks.values()) {
             result.append(subTask.toString());

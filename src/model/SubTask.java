@@ -11,13 +11,13 @@ public class SubTask extends Task {
 
     @Override
     public String toString(){
-        StringBuilder result = new StringBuilder("Sub task of epic task: ");
-        result.append(epic.name);
-        result.append(" with ID: ");
-        result.append(epic.id);
-        result.append("\n");
-        result.append(super.toString());
-        return result.toString();
+        String result = "Sub task of epic task: " +
+                epic.name +
+                " with ID: " +
+                epic.id +
+                "\n" +
+                super.toString();
+        return result;
     }
 
     public EpicTask getEpic() {
