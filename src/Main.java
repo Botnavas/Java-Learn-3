@@ -15,11 +15,11 @@ public class Main {
         EpicTask epic2 = new EpicTask("Second epic", "Create second epic");
         SubTask epic2FirstSubTask = new SubTask("SubTask for second epic",
                 "Create subTask for second epic", epic2);
-        taskManager.addTask(epic1);
-        taskManager.addTask(epic2);
-        taskManager.addTask(epic1FirstSubTask);
-        taskManager.addTask(epic1SecondSubTask);
-        taskManager.addTask(epic2FirstSubTask);
+        taskManager.addEpicTask(epic1);
+        taskManager.addEpicTask(epic2);
+        taskManager.addSubTask(epic1FirstSubTask);
+        taskManager.addSubTask(epic1SecondSubTask);
+        taskManager.addSubTask(epic2FirstSubTask);
 
         for (Task task : taskManager.getAllTasks()) {
             System.out.println(task);

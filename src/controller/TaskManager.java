@@ -15,14 +15,6 @@ public class TaskManager {
         if (task == null) {
             return;
         }
-        if (task instanceof EpicTask) {
-            addEpicTask((EpicTask) task);
-            return;
-        }
-        if (task instanceof SubTask) {
-            addSubTask((SubTask) task);
-            return;
-        }
         task.setId(generateID());
         tasks.put(task.getId(), task);
     }
@@ -70,9 +62,9 @@ public class TaskManager {
     }
 
     public Collection<Task> getAllTasks() {
-        Collection<Task> taskCollection = new ArrayList<>(tasks.values());
-        taskCollection.addAll(epicTasks.values());
-        return taskCollection;
+        Collection<Task> resultCollection = new ArrayList<>(tasks.values());
+        resultCollection.addAll(epicTasks.values());
+        return resultCollection;
     }
 
     public Collection<SubTask> getSubTasksByEpicID(int id) {
