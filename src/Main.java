@@ -21,14 +21,14 @@ public class Main {
         taskManager.addTask(epic1SecondSubTask);
         taskManager.addTask(epic2FirstSubTask);
 
-        for (Task task : taskManager.getTasks()) {
+        for (Task task : taskManager.getAllTasks()) {
             System.out.println(task);
         }
 
         epic1FirstSubTask.setStatus(TaskStatus.DONE);
         System.out.println("New status for first epic and first SubTask");
 
-        for (Task task : taskManager.getTasks()) {
+        for (Task task : taskManager.getAllTasks()) {
             System.out.println(task);
         }
 

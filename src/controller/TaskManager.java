@@ -3,16 +3,18 @@ package controller;
 import model.EpicTask;
 import model.SubTask;
 import model.Task;
-import model.TaskStatus;
 
 import java.util.*;
 
 public class TaskManager {
-    private HashMap <Integer, Task> tasks = new HashMap<>();
+    private HashMap<Integer, Task> tasks = new HashMap<>();
+    private HashMap<Integer, EpicTask> epicTasks = new HashMap<>();
     private int idGenerator = 0;
 
-    //TODO: add id generation
     public void addTask(Task task) {
+        if (task == null) {
+            return;
+        }
         if (task instanceof EpicTask) {
             addEpicTask((EpicTask) task);
             return;
@@ -21,35 +23,42 @@ public class TaskManager {
             addSubTask((SubTask) task);
             return;
         }
-        task.setId(generateId());
+        task.setId(generateID());
         tasks.put(task.getId(), task);
     }
 
-    //TODO: refactor
     public void addSubTask(SubTask subTask) {
-        subTask.setId(generateId());
-        ((EpicTask) tasks.get(subTask.getEpic().getId())).addSubTask(subTask);
+        if (subTask == null) {
+            return;
+        }
+        subTask.setId(generateID());
+        epicTasks.get(subTask.getEpic().getId()).addSubTask(subTask);
     }
 
     public void addEpicTask(EpicTask epic) {
-        epic.setId(generateId());
-        tasks.put(epic.getId(), epic);
+        if (epic == null) {
+            return;
+        }
+        epic.setId(generateID());
+        epicTasks.put(epic.getId(), epic);
     }
 
     public void changeTask(Task task) {
-        if (!(task instanceof SubTask) && !(task instanceof EpicTask)) {
+        if (task != null) {
             tasks.put(task.getId(), task);
         }
     }
 
     public void changeEpicTask(EpicTask epic) {
-        if ((tasks.get(epic.getId()) instanceof EpicTask)) {
-            tasks.put(epic.getId(), epic);
+        if (epic != null) {
+            epicTasks.put(epic.getId(), epic);
         }
     }
 
     public void changeSubTask(SubTask subTask) {
-        ((EpicTask) tasks.get(subTask.getEpic().getId())).addSubTask(subTask);
+        if (subTask != null) {
+            epicTasks.get(subTask.getEpic().getId()).addSubTask(subTask);
+        }
     }
 
     public Collection<Task> getTasks() {
@@ -57,98 +66,77 @@ public class TaskManager {
     }
 
     public Collection<EpicTask> getEpicTasks() {
-        Collection<EpicTask> epicTasks = new ArrayList<>();
-        for (Task task : tasks.values()) {
-            if (task instanceof EpicTask) {
-                epicTasks.add((EpicTask) task);
-            }
-        }
-        return epicTasks;
+        return epicTasks.values();
     }
 
-    public Collection<SubTask> getSubTaskOfEpicByID(int id) {
-        if (tasks.get(id) instanceof EpicTask) {
-            return ((EpicTask) tasks.get(id)).getSubTasks();
+    public Collection<Task> getAllTasks() {
+        Collection<Task> taskCollection = new ArrayList<>(tasks.values());
+        taskCollection.addAll(epicTasks.values());
+        return taskCollection;
+    }
+
+    public Collection<SubTask> getSubTasksByEpicID(int id) {
+        if (epicTasks.get(id) != null) {
+            return  epicTasks.get(id).getSubTasks();
         } else {
             return null;
         }
     }
 
-    public Task getTaskByID(int id) {
-        return tasks.get(id);
+    public Task getTask(int id) {
+        if (tasks.get(id) != null) {
+            return tasks.get(id);
+        } else {
+            return null;
+        }
     }
 
-    public EpicTask getEpicTaskByID(int id) {
-        if (tasks.get(id) instanceof EpicTask) {
-            return ((EpicTask) tasks.get(id));
+    public EpicTask getEpicTask(int id) {
+        if (epicTasks.get(id) != null) {
+            return (epicTasks.get(id));
         } else {
             return null;
         }
     }
 
     public SubTask getSubTaskByID(int id) {
-        for (Task task : tasks.values()) {
-            if (task instanceof EpicTask) {
-                if (((EpicTask) task).getSubTaskByID(id) != null) {
-                    return ((EpicTask) task).getSubTaskByID(id);
-                }
+        for (EpicTask epicTask : epicTasks.values()) {
+            if ( epicTask.getSubTaskByID(id) != null) {
+                return epicTask.getSubTaskByID(id);
             }
         }
         return null;
     }
 
-    public void removeAllTypesOfTasks() {
+    public void removeAllTasks() {
         tasks.clear();
     }
 
-    public void removeAllTasks() {
-        for (Task task : tasks.values()) {
-            if (!(task instanceof EpicTask)) {
-                tasks.remove(task.getId());
-            }
-        }
-    }
-
     public void removeAllEpicTasks() {
-        for (Task task : tasks.values()) {
-            if (task instanceof EpicTask) {
-                tasks.remove(task.getId());
-            }
-        }
+        epicTasks.clear();
     }
 
     public void removeAllSubTasks() {
-        for (Task task : tasks.values()) {
-            if (task instanceof EpicTask) {
-                ((EpicTask) task).removeAllSubTasks();
-            }
+        for (EpicTask epicTask : epicTasks.values()) {
+            epicTask.removeAllSubTasks();
         }
     }
 
     public void removeSubTaskByID(int id) {
-        for (Task task : tasks.values()) {
-            if (task instanceof EpicTask) {
-                if (((EpicTask) task).getSubTaskByID(id) != null) {
-                    ((EpicTask) task).removeSubTaskByID(id);
-                    return;
-                }
-            }
+        if (getSubTaskByID(id) != null) {
+            epicTasks.get(getSubTaskByID(id).getEpic().getId()).removeSubTaskByID(id);
         }
     }
 
-    public void removeEpicTaskById(int id) {
-        if (tasks.get(id) instanceof EpicTask) {
-            tasks.remove(id);
-        }
+    public void removeEpicTaskByID(int id) {
+        epicTasks.remove(id);
     }
 
     public void removeTaskByID(int id) {
-        if (!(tasks.get(id) instanceof EpicTask)) {
-            tasks.remove(id);
-        }
+        tasks.remove(id);
     }
 
-    private int generateId() {
+    private int generateID() {
         return ++idGenerator;
     }
 }

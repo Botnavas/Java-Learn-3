@@ -12,6 +12,9 @@ public class EpicTask extends Task {
     }
 
     public void addSubTask(SubTask subTask) {
+        if (subTask == null) {
+            return;
+        }
         subTasks.put(subTask.getId(), subTask);
     }
 
