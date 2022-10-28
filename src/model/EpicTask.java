@@ -7,8 +7,8 @@ public class EpicTask extends Task {
 
     private HashMap<Integer, SubTask> subTasks = new HashMap<>();
 
-    public EpicTask(String name, String description, int identifier) {
-        super(name, description, identifier);
+    public EpicTask(String name, String description) {
+        super(name, description);
     }
 
     public void addSubTask(SubTask subTask) {
@@ -19,16 +19,8 @@ public class EpicTask extends Task {
         return subTasks.values();
     }
 
-    public Collection<Integer> getSubtasksIDs() {
-        return  subTasks.keySet();
-    }
-
     public SubTask getSubTaskByID(int id) {
         return subTasks.get(id);
-    }
-
-    public void setStatusForSubTaskById(int id, TaskStatus status) {
-        subTasks.get(id).setStatus(status);
     }
 
     public void removeAllSubTasks() {
@@ -39,7 +31,6 @@ public class EpicTask extends Task {
         subTasks.remove(id);
     }
 
-    //TODO: refactor
     @Override
     public TaskStatus getStatus() {
         boolean isNew = true;

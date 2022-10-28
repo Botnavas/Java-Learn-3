@@ -3,14 +3,12 @@ package model;
 import java.util.Objects;
 
 public class Task {
-    protected final int id;
+    protected int id = 0;
     protected TaskStatus status;
     protected String name;
     protected String description;
 
-    //TODO: refactor
-    public Task(String name, String description, int id) {
-        this.id = id;
+    public Task(String name, String description) {
         this.name = name;
         this.description = description;
         status = TaskStatus.NEW;
@@ -30,6 +28,10 @@ public class Task {
 
     public String getName() {
         return name;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setName(String name) {
@@ -69,7 +71,6 @@ public class Task {
                 && description.equals(task.description);
     }
 
-    //TODO: hashcode(id)
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
