@@ -2,7 +2,7 @@ package controller;
 
 import model.Task;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
@@ -11,7 +11,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     public InMemoryHistoryManager(int historySize) {
         this.historySize = historySize;
-        history = new ArrayList<>(historySize + 1);
+        history = new LinkedList<>();
     }
 
     @Override
