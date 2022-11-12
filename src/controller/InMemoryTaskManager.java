@@ -31,14 +31,13 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
-        int epicId = subTask.getEpic().getId();
-
-        if (epicTasks.containsKey(epicId)) {
-            if (epicTasks.get(epicId).containsSubTask(subTask.getId())) {
-                epicTasks.get(epicId).removeSubTaskByID(subTask.getId());
+        if (epicTasks.containsKey(subTask.getEpic().getId())) {
+            EpicTask epicTask = epicTasks.get(subTask.getEpic().getId());
+            if (epicTask.containsSubTask(subTask.getId())) {
+                epicTask.removeSubTaskByID(subTask.getId());
             }
             subTask.setId(generateID());
-            epicTasks.get(epicId).addSubTask(subTask);
+            epicTask.addSubTask(subTask);
         } else {
             addEpicTask(subTask.getEpic());
         }
@@ -50,11 +49,9 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
-        int newEpicId = generateID();
-
-        epic.setId(newEpicId);
-        epicTasks.put(newEpicId, epic);
-        for (SubTask subTask : epicTasks.get(newEpicId).getSubTasks()) {
+        epic.setId(generateID());
+        epicTasks.put(epic.getId(), epic);
+        for (SubTask subTask : epic.getSubTasks()) {
             addSubTask(subTask);
         }
     }
@@ -104,9 +101,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTask(int id) {
-        if (tasks.get(id) != null) {
-            history.addTask(tasks.get(id));
-            return tasks.get(id);
+        Task task = tasks.get(id);
+
+        if (task != null) {
+            history.addTask(task);
+            return task;
         } else {
             return null;
         }
@@ -114,9 +113,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public EpicTask getEpicTask(int id) {
-        if (epicTasks.get(id) != null) {
-            history.addTask(epicTasks.get(id));
-            return epicTasks.get(id);
+        EpicTask epicTask = epicTasks.get(id);
+
+        if (epicTask != null) {
+            history.addTask(epicTask);
+            return epicTask;
         } else {
             return null;
         }
