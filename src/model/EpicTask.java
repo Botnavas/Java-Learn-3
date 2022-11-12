@@ -18,6 +18,10 @@ public class EpicTask extends Task {
         subTasks.put(subTask.getId(), subTask);
     }
 
+    public boolean containsSubTask(int id) {
+        return subTasks.containsKey(id);
+    }
+
     public Collection<SubTask> getSubTasks() {
         return subTasks.values();
     }
@@ -69,6 +73,7 @@ public class EpicTask extends Task {
         for (SubTask subTask : subTasks.values()) {
             result.append(subTask.toString());
         }
+        result.append("\n");
         return result.toString();
     }
 }
