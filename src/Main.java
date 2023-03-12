@@ -25,7 +25,7 @@ public class Main {
         taskManager.getSubTaskByID(Sub2Epic1.getId());
         taskManager.getSubTaskByID(Sub3Epic1.getId());
         taskManager.getEpicTask(epic1.getId());
-        taskManager.removeTaskByID(epic1.getId());
+        //taskManager.removeTaskByID(epic1.getId());
 
 
         //
