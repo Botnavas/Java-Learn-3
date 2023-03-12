@@ -10,22 +10,22 @@ import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final int MAX_SIZE;
-    private LinkedListNode<Task> head;
-    private LinkedListNode<Task> tail;
-    private HashMap<Integer, LinkedListNode<Task>> addedTasks;
+    private TaskListNode head;
+    private TaskListNode tail;
+    private HashMap<Integer, TaskListNode> addedTasks;
 
     public InMemoryHistoryManager(int MAX_SIZE) {
         this.MAX_SIZE = MAX_SIZE;
 
         addedTasks = new HashMap<>();
-        tail = new LinkedListNode<>(null);
+        tail = new TaskListNode();
 
         head = tail;
     }
 
     @Override
     public void addTask(Task task) {
-        LinkedListNode<Task> newTail = new LinkedListNode<>(task);
+        TaskListNode newTail = new TaskListNode(task, null, tail);
 
         remove(task.getId());
 
@@ -34,7 +34,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
 
         tail.setNext(newTail);
-        newTail.setPrevious(tail);
         tail = newTail;
 
         addedTasks.put(task.getId(), tail);
@@ -44,7 +43,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     public List<Task> getHistory() {
         List<Task> data = new ArrayList<>();
 
-        LinkedListNode<Task> iterator = head;
+        TaskListNode iterator = head;
         while (iterator != null) {
             data.add(iterator.getValue());
             iterator = iterator.getNext();
@@ -58,8 +57,9 @@ public class InMemoryHistoryManager implements HistoryManager {
             return;
         }
 
-        if (addedTasks.get(id).getValue() instanceof EpicTask) {
-            for (SubTask subTask : ((EpicTask) addedTasks.get(id).getValue()).getSubTasks()) {
+        Task task = addedTasks.get(id).getValue();
+        if (task instanceof EpicTask) {
+            for (SubTask subTask : ((EpicTask) task).getSubTasks()) {
                 remove(subTask.getId());
             }
         }
@@ -68,24 +68,24 @@ public class InMemoryHistoryManager implements HistoryManager {
 
         if (node == head) {
             head = head.getNext();
-            head.setPrevious(null);
+            head.setPrev(null);
             return;
         }
 
         if (node == tail) {
-            tail = tail.getPrevious();
+            tail = tail.getPrev();
             tail.setNext(null);
             return;
         }
 
-        node.getPrevious().setNext(node.getNext());
-        node.getNext().setPrevious(node.getPrevious());
+        node.getPrev().setNext(node.getNext());
+        node.getNext().setPrev(node.getPrev());
     }
 
     @Override
     public void clear() {
         addedTasks.clear();
-        tail.setPrevious(null);
+        tail.setPrev(null);
         tail.setValue(null);
         head = tail;
     }
