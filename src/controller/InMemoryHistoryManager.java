@@ -6,95 +6,87 @@ import model.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final int historySize;
-    private int currentSize;
+    private final int MAX_SIZE;
     private LinkedListNode<Task> head;
-    private LinkedListNode<Task> endPointer;
+    private LinkedListNode<Task> tail;
     private HashMap<Integer, LinkedListNode<Task>> addedTasks;
 
-    public InMemoryHistoryManager(int historySize) {
-        this.historySize = historySize;
+    public InMemoryHistoryManager(int MAX_SIZE) {
+        this.MAX_SIZE = MAX_SIZE;
+
         addedTasks = new HashMap<>();
-        head = new LinkedListNode<>(null);
-        endPointer = new LinkedListNode<>(null);
-        currentSize = 0;
+        tail = new LinkedListNode<>(null);
+
+        head = tail;
     }
 
     @Override
     public void addTask(Task task) {
-        if (addedTasks.containsKey(task.getId())) {
-            removeNode(addedTasks.get(task.getId()));
+        LinkedListNode<Task> newTail = new LinkedListNode<>(task);
+
+        remove(task.getId());
+
+        if (addedTasks.size() == MAX_SIZE) {
+            remove(head.getValue().getId());
         }
 
-        if (currentSize == 0) {
-            head.setValue(task);
-            head.setNext(endPointer);
-            endPointer.setPrevious(head);
-            addedTasks.put(task.getId(), head);
-        } else {
-            LinkedListNode newNode = new LinkedListNode<>(task);
-            endPointer.getPrevious().setNext(newNode);
-            newNode.setPrevious(endPointer.getPrevious());
-            newNode.setNext(endPointer);
-            endPointer.setPrevious(newNode);
-            addedTasks.put(task.getId(), newNode);
-        }
+        tail.setNext(newTail);
+        newTail.setPrevious(tail);
+        tail = newTail;
 
-        if (currentSize == historySize) {
-            addedTasks.remove(head.getValue().getId());
-            removeNode(head);
-        }
-        currentSize++;
+        addedTasks.put(task.getId(), tail);
     }
 
     @Override
-    public ArrayList<Task> getHistory() {
-        ArrayList<Task> data = new ArrayList<>();
+    public List<Task> getHistory() {
+        List<Task> data = new ArrayList<>();
 
         LinkedListNode<Task> iterator = head;
-        while (iterator.getNext() != null) {
+        while (iterator != null) {
             data.add(iterator.getValue());
             iterator = iterator.getNext();
         }
         return data;
     }
 
-    private void removeNode(LinkedListNode node) {
-        if (node.getPrevious() == null) {
-            head = head.getNext();
-            head.setPrevious(null);
-        } else {
-            node.getPrevious().setNext(node.getNext());
-            node.getNext().setPrevious(node.getPrevious());
-        }
-        currentSize--;
-    }
-
     @Override
     public void remove(int id) {
-        if (addedTasks.containsKey(id)) {
-            if (addedTasks.get(id).getValue() instanceof EpicTask) {
-                for (SubTask subTask : ((EpicTask)addedTasks.get(id).getValue()).getSubTasks()) {
-                    if (addedTasks.containsKey(subTask.getId())) {
-                        this.remove(subTask.getId());
-                    }
-                }
-                removeNode(addedTasks.get(id));
-            } else {
-                removeNode(addedTasks.get(id));
-            }
-            addedTasks.remove(id);
+        if (!addedTasks.containsKey(id)) {
+            return;
         }
+
+        if (addedTasks.get(id).getValue() instanceof EpicTask) {
+            for (SubTask subTask : ((EpicTask) addedTasks.get(id).getValue()).getSubTasks()) {
+                remove(subTask.getId());
+            }
+        }
+
+        var node = addedTasks.remove(id);
+
+        if (node == head) {
+            head = head.getNext();
+            head.setPrevious(null);
+            return;
+        }
+
+        if (node == tail) {
+            tail = tail.getPrevious();
+            tail.setNext(null);
+            return;
+        }
+
+        node.getPrevious().setNext(node.getNext());
+        node.getNext().setPrevious(node.getPrevious());
     }
 
     @Override
     public void clear() {
         addedTasks.clear();
-        head.setValue(null);
-        head.setNext(null);
-        endPointer.setPrevious(null);
+        tail.setPrevious(null);
+        tail.setValue(null);
+        head = tail;
     }
-
 }
