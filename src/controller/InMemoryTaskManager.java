@@ -7,26 +7,45 @@ import model.Task;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private HistoryManager history;
-    private Map<Integer, Task> tasks = new HashMap<>();
-    private Map<Integer, EpicTask> epicTasks = new HashMap<>();
-    private int idGenerator = 0;
+    protected HistoryManager history;
+    protected Map<Integer, Task> tasks = new HashMap<>();
+    protected Map<Integer, EpicTask> epicTasks = new HashMap<>();
+    protected int idGenerator = 0;
 
     public InMemoryTaskManager(HistoryManager history) {
         this.history = history;
     }
 
+    public InMemoryTaskManager(InMemoryTaskManager manager) {
+        this.history = manager.history;
+        this.epicTasks = manager.epicTasks;
+        this.tasks = manager.tasks;
+        this.idGenerator = manager.idGenerator;
+    }
+
     @Override
-    public void addTask(Task task) {
+    public void addTask(Task task, boolean setId) {
         if (task == null) {
             return;
         }
-        task.setId(generateID());
+
+        if (setId) {
+            task.setId(generateID());
+        }
+
+        if (task instanceof EpicTask) {
+           addEpicTask((EpicTask) task, setId);
+            return;
+        }
+        if (task instanceof SubTask) {
+            addSubTask((SubTask) task, setId);
+            return;
+        }
         tasks.put(task.getId(), task);
     }
 
     @Override
-    public void addSubTask(SubTask subTask) {
+    public void addSubTask(SubTask subTask, boolean setId) {
         if (subTask == null) {
             return;
         }
@@ -36,23 +55,29 @@ public class InMemoryTaskManager implements TaskManager {
             if (epicTask.containsSubTask(subTask.getId())) {
                 epicTask.removeSubTaskByID(subTask.getId());
             }
-            subTask.setId(generateID());
+            if (setId) {
+                subTask.setId(generateID());
+            }
             epicTask.addSubTask(subTask);
         } else {
-            addEpicTask(subTask.getEpic());
+            addEpicTask(subTask.getEpic(), setId);
+            addSubTask(subTask, setId);
         }
     }
 
     @Override
-    public void addEpicTask(EpicTask epic) {
+    public void addEpicTask(EpicTask epic, boolean setId) {
         if (epic == null) {
             return;
         }
 
-        epic.setId(generateID());
+        if (setId) {
+            epic.setId(generateID());
+        }
+
         epicTasks.put(epic.getId(), epic);
         for (SubTask subTask : epic.getSubTasks()) {
-            addSubTask(subTask);
+            addSubTask(subTask, setId);
         }
     }
 
@@ -102,6 +127,12 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTask(int id) {
         Task task = tasks.get(id);
+        if (task == null) {
+            task = epicTasks.get(id);
+            if (task == null) {
+                task = getSubTaskByID(id);
+            }
+        }
 
         if (task != null) {
             history.addTask(task);

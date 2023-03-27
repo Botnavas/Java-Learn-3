@@ -8,10 +8,21 @@ public class Task {
     protected String name;
     protected String description;
 
+    public Task(int id) {
+        this.id = id;
+    }
+
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
         status = TaskStatus.NEW;
+    }
+
+    public Task (String[] info) {
+        this.name = info[2];
+        this.description = info[4];
+        this.id = Integer.parseInt(info[0]);
+        this.status = TaskStatus.valueOf(info[3]);
     }
 
     public String getDescription() {
@@ -57,6 +68,11 @@ public class Task {
                 "\nDescription: " +
                 description +
                 "\n";
+    }
+
+    public String toCsvString() {
+        return id + "," + TaskType.TASK + "," + name + "," + status + "," +
+                description + "," + System.lineSeparator();
     }
 
     @Override

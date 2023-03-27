@@ -7,8 +7,16 @@ public class EpicTask extends Task {
 
     private HashMap<Integer, SubTask> subTasks = new HashMap<>();
 
+    public EpicTask(int id) {
+        super(id);
+    }
+
     public EpicTask(String name, String description) {
         super(name, description);
+    }
+
+    public EpicTask(String[] info) {
+        super(info);
     }
 
     public void addSubTask(SubTask subTask) {
@@ -44,16 +52,12 @@ public class EpicTask extends Task {
         boolean isDone = true;
         for (SubTask subTask : subTasks.values()) {
             switch (subTask.status) {
-                case NEW:
-                    isDone = false;
-                    break;
-                case IN_PROGRESS:
+                case NEW -> isDone = false;
+                case IN_PROGRESS -> {
                     isNew = false;
                     isDone = false;
-                    break;
-                case DONE:
-                    isNew = false;
-                    break;
+                }
+                case DONE -> isNew = false;
             }
         }
         if (isNew) {
@@ -75,5 +79,11 @@ public class EpicTask extends Task {
         }
         result.append("\n");
         return result.toString();
+    }
+
+    @Override
+    public String toCsvString() {
+        return id + "," + TaskType.EPIC + "," + name + "," + status + "," +
+                description +"," + System.lineSeparator();
     }
 }

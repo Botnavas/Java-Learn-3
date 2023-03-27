@@ -83,6 +83,18 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
+    public String toCsvString() {
+        StringBuilder result = new StringBuilder();
+
+        for (Task task : getHistory()) {
+            if (task != null)
+            result.append(task.getId()).append(",");
+        }
+
+        return  result.toString();
+    }
+
+    @Override
     public void clear() {
         addedTasks.clear();
         tail.setPrev(null);
