@@ -42,25 +42,32 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             for (String str : strings) {
                 String[] info = str.split(",");
 
+                if (isEndOfTaskList) {
+                    for (String num : info) {
+                        int id = Integer.parseInt(num);
+                        super.getTask(id);
+                    }
+                }
+
                 if (info.length > 1 && !isEndOfTaskList) {
                     switch (TaskType.valueOf(info[1])) {
-                        case EPIC -> super.addEpicTask(new EpicTask(info), false);
-                        case TASK -> super.addTask(new Task(info), false);
-                        case SUBTASK -> {
+                        case EPIC: {
+                            addEpicTaskFromFile(new EpicTask(info));
+                            break;
+                        }
+                        case TASK: {
+                            addTaskFromFile(new Task(info));
+                            break;
+                        }
+                        case SUBTASK: {
                             int epicId = Integer.parseInt(info[5].substring(0, info[5].length() - 1));
-                            super.addSubTask(new SubTask(info,
-                                    epicTasks.get(epicId)), false);
+                            epicTasks.get(epicId).addSubTask(new SubTask(info,
+                                    epicTasks.get(epicId)));
                         }
                     }
                     idGenerator++;
                 } else {
                     isEndOfTaskList = true;
-                }
-
-                if (isEndOfTaskList) {
-                    for (String num : info) {
-                        history.addTask(getTask(Integer.getInteger(num)));
-                    }
                 }
             }
         } catch (Exception e) {
@@ -95,21 +102,50 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
     }
 
+    private void addTaskFromFile(Task task) {
+        tasks.put(task.getId(), task);
+    }
+
+    private void addEpicTaskFromFile(EpicTask epic) {
+        epicTasks.put(epic.getId(), epic);
+    }
+
     @Override
-    public void addTask(Task task, boolean setId) {
-        super.addTask(task, setId);
+    public void addTask(Task task) {
+        super.addTask(task);
         save();
     }
 
     @Override
-    public void addSubTask(SubTask subTask, boolean setId) {
-        super.addSubTask(subTask, setId);
+    public void addSubTask(SubTask subTask) {
+        super.addSubTask(subTask);
         save();
     }
 
     @Override
-    public void addEpicTask(EpicTask epic, boolean setId) {
-        super.addEpicTask(epic, setId);
+    public void addEpicTask(EpicTask epic) {
+        super.addEpicTask(epic);
         save();
+    }
+
+    @Override
+    public Task getTask(int id) {
+        Task task = super.getTask(id);
+        save();
+        return task;
+    }
+
+    @Override
+    public SubTask getSubTaskById(int id) {
+        SubTask sub = super.getSubTaskById(id);
+        save();
+        return sub;
+    }
+
+    @Override
+    public  EpicTask getEpicTask(int id) {
+        EpicTask epic = super.getEpicTask(id);
+        save();
+        return epic;
     }
 }

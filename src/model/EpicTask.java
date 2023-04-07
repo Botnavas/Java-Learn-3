@@ -52,12 +52,16 @@ public class EpicTask extends Task {
         boolean isDone = true;
         for (SubTask subTask : subTasks.values()) {
             switch (subTask.status) {
-                case NEW -> isDone = false;
-                case IN_PROGRESS -> {
+                case NEW: {
+                    isDone = false;
+                }
+                case IN_PROGRESS: {
                     isNew = false;
                     isDone = false;
                 }
-                case DONE -> isNew = false;
+                case DONE: {
+                    isNew = false;
+                }
             }
         }
         if (isNew) {

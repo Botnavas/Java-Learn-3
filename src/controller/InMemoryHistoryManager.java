@@ -18,9 +18,9 @@ public class InMemoryHistoryManager implements HistoryManager {
         this.MAX_SIZE = MAX_SIZE;
 
         addedTasks = new HashMap<>();
-        tail = new TaskListNode();
+        head = new TaskListNode();
 
-        head = tail;
+        tail = head;
     }
 
     @Override
@@ -35,6 +35,12 @@ public class InMemoryHistoryManager implements HistoryManager {
 
         tail.setNext(newTail);
         tail = newTail;
+
+        if (addedTasks.size() == 0) {
+            head = tail;
+            tail = head;
+            tail.setPrev(head);
+        }
 
         addedTasks.put(task.getId(), tail);
     }

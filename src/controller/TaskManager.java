@@ -7,9 +7,9 @@ import model.Task;
 import java.util.Collection;
 
 public interface TaskManager {
-    void addTask(Task task, boolean setId);
-    void addSubTask(SubTask subTask, boolean setId);
-    void addEpicTask(EpicTask epicTask, boolean setId);
+    void addTask(Task task);
+    void addSubTask(SubTask subTask);
+    void addEpicTask(EpicTask epicTask);
     void changeTask(Task task);
     void changeSubTask(SubTask subTask);
     void changeEpicTask(EpicTask epicTask);
@@ -20,7 +20,7 @@ public interface TaskManager {
     Collection<SubTask> getSubTasksByEpicID(int id);
     Task getTask(int id);
     EpicTask getEpicTask(int id);
-    SubTask getSubTaskByID(int id);
+    SubTask getSubTaskById(int id);
     void removeSubTaskByID(int id);
     void removeEpicTaskByID(int id);
     void removeAllTasks();
